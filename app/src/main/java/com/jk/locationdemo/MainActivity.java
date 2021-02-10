@@ -1,17 +1,27 @@
 package com.jk.locationdemo;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private final String TAG = this.getClass().getCanonicalName();
     private Button btnOpenMap;
     private Button btnShowNavigation;
     private TextView tvLocation;
+    private LocationManager locationManager;
+    private LatLng location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +35,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.btnShowNavigation.setOnClickListener(this);
 
         tvLocation = findViewById(R.id.tvLocation);
+
+        this.locationManager = LocationManager.getInstance();
+        this.locationManager.checkPermissions(this);
+        if(this.locationManager.locationPermissionGranted) {
+            this.getLastLocation();
+        }
     }
 
     @Override
@@ -40,5 +56,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     break;
             }
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if(requestCode == this.locationManager.LOCATION_PERMISSION_REQUEST_CODE) {
+            this.locationManager.locationPermissionGranted = (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED);
+
+            if (this.locationManager.locationPermissionGranted) {
+                //start receiving location and display on screen
+
+                Log.e(TAG, "LocationPermissionGranted " + this.locationManager.locationPermissionGranted);
+
+            }
+            return;
+        }
+    }
+
+    private void getLastLocation() {
+        this.locationManager.getLastLocation(this).observe(this, new Observer<Location>() {
+            @Override
+            public void onChanged(Location loc) {
+                if(loc != null) {
+                    tvLocation.setText("LAT: " + loc.getLatitude()
+                            + "\nLON: " + loc.getLongitude());
+                    location = new LatLng(loc.getLatitude(), loc.getLongitude());
+                }
+            }
+        });
     }
 }
