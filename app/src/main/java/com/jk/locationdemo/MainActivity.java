@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             };
 
-            this.locationManager.requestLocationUpdates(this.locationCallback);
+            this.locationManager.requestLocationUpdates(this, this.locationCallback);
 
         }
     }
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
-        this.locationManager.requestLocationUpdates(this.locationCallback);
+        this.locationManager.requestLocationUpdates(this, this.locationCallback);
     }
 
     @Override

@@ -104,10 +104,10 @@ public class LocationManager {
     }
 
     @SuppressLint("MissingPermission")
-    public void requestLocationUpdates(LocationCallback locationCallback) {
+    public void requestLocationUpdates(Context context, LocationCallback locationCallback) {
         if(this.locationPermissionGranted) {
             try {
-                this.fusedLocationProviderClient.requestLocationUpdates(this.locationRequest, locationCallback, Looper.getMainLooper());
+                this.getFusedLocationProviderClient(context).requestLocationUpdates(this.locationRequest, locationCallback, Looper.getMainLooper());
             }catch(Exception ex) {
                 Log.e(TAG, ex.toString());
                 Log.e(TAG, ex.getLocalizedMessage());
