@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -14,6 +15,7 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -75,7 +77,7 @@ public class LocationManager {
                             public void onSuccess(Location loc) {
                                 if(loc != null) {
                                     location.setValue(loc);
-                                    Log.i(TAG, "Last Location: LAT:" + location.getValue().getLatitude() + " LON: " + location.getValue().getLongitude());
+                                    Log.e(TAG, "Last Location: LAT:" + location.getValue().getLatitude() + " LON: " + location.getValue().getLongitude());
                                 }
                             }
                         })
@@ -99,6 +101,27 @@ public class LocationManager {
         }
 
         return null;
+    }
+
+    @SuppressLint("MissingPermission")
+    public void requestLocationUpdates(LocationCallback locationCallback) {
+        if(this.locationPermissionGranted) {
+            try {
+                this.fusedLocationProviderClient.requestLocationUpdates(this.locationRequest, locationCallback, Looper.getMainLooper());
+            }catch(Exception ex) {
+                Log.e(TAG, ex.toString());
+                Log.e(TAG, ex.getLocalizedMessage());
+            }
+        }
+    }
+
+    public void stopLocationUpdates(Context context, LocationCallback locationCallback) {
+        try {
+            this.getFusedLocationProviderClient(context).removeLocationUpdates(locationCallback);
+        }catch(Exception ex) {
+            Log.e(TAG, ex.toString());
+            Log.e(TAG, ex.getLocalizedMessage());
+        }
     }
 
 }

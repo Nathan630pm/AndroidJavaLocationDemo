@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.maps.model.LatLng;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -22,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView tvLocation;
     private LocationManager locationManager;
     private LatLng location;
+    private LocationCallback locationCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +43,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.locationManager.checkPermissions(this);
         if(this.locationManager.locationPermissionGranted) {
             this.getLastLocation();
+
+            locationCallback = new LocationCallback(){
+                @Override
+                public void onLocationResult(LocationResult locationResult) {
+                    if(locationResult == null){
+                        return;
+                    }
+                    for(Location loc : locationResult.getLocations()) {
+                        tvLocation.setText("LAT: " + loc.getLatitude()
+                                + "\nLON: " + loc.getLongitude());
+                        Log.e(TAG, "LAT: " + loc.getLatitude()
+                                + "\nLON: " + loc.getLongitude());
+                        Log.e(TAG, "# of locations: " +locationResult.getLocations().size());
+                    }
+                }
+            };
+
+            this.locationManager.requestLocationUpdates(this.locationCallback);
+
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        this.locationManager.stopLocationUpdates(this, this.locationCallback);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        this.locationManager.requestLocationUpdates(this.locationCallback);
     }
 
     @Override
