@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     for(Location loc : locationResult.getLocations()) {
                         tvLocation.setText("LAT: " + loc.getLatitude()
                                 + "\nLON: " + loc.getLongitude());
-                        Log.e(TAG, "LAT: " + loc.getLatitude()
+                        Log.e(TAG, "\nLAT: " + loc.getLatitude()
                                 + "\nLON: " + loc.getLongitude());
                         Log.e(TAG, "# of locations: " +locationResult.getLocations().size());
                     }
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (view != null){
             switch (view.getId()){
                 case R.id.btnOpenMap:
-
+                    this.showLocationOnMap();
                     break;
 
                 case R.id.btnShowNavigation:
@@ -90,6 +91,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     break;
             }
         }
+    }
+
+    private void showLocationOnMap() {
+        Intent mapIntent = new Intent(this, MapsActivity.class);
+
+        startActivity(mapIntent);
     }
 
     @Override
